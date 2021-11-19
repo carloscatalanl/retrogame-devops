@@ -7,9 +7,7 @@ on:
   # pull_request:
   #   branches: [ infrastructure ]
 
-# defaults:
-#   run:
-#     working-directory: ./terraform/infrastructure
+
 
 jobs:
 
@@ -17,12 +15,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./terraform/infrastructure
     env:
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
       ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
-      working-directory: ./terraform/infrastructure
 
     steps:
       - uses: actions/checkout@v2
@@ -49,8 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: Terraform
 
-    env:
-      working-directory: ./helm
+    defaults:
+      run:
+        working-directory: ./terraform/infrastructure
+        
     steps:
 
       - uses: actions/checkout@v2
