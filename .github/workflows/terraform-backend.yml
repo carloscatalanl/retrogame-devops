@@ -1,15 +1,13 @@
-name: Deploy Infrastructure in Azure
+name: Deploy terraform backend infrastructure in Azure
 
 on:
 
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ terraform-backend ]
 
 defaults:
   run:
-    working-directory: ./terraform
+    working-directory: ./tf-backend
 
 jobs:
 
