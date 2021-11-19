@@ -45,9 +45,37 @@ jobs:
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
   
+  Release:
+    
+    needs: Terraform
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build the Docker image
+      run: docker build -t pacman-app .
+      
+    - name: Azure Container Registry Login
+      uses: Azure/docker-login@v1
+      with:
+        # Container registry username
+        username: ${{ secrets.ACR_USER }}
+        # Container registry password
+        password: ${{ secrets.ACR_PASSWORD }}
+        # Container registry server url
+        login-server: ${{ secrets.ACR_SERVER }}
+      
+    - name: Tag Docker image
+      run: docker tag pacman-app ${{ secrets.ACR_SERVER }}/pacman-app
+    
+    - name: Push Docker image into ACR
+      run: docker push ${{ secrets.ACR_SERVER }}/pacman-app      
+
   Helm:
     runs-on: ubuntu-latest
-    needs: Terraform
+    needs: Release
 
     defaults:
       run:
