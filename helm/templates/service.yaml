@@ -1,0 +1,30 @@
+# Mongo Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: mongo
+  name: mongo
+spec:
+  type: {{ .Values.mongoService.type }}
+  ports:
+    - port: {{ .Values.mongoService.port }}
+      targetPort: {{ .Values.mongoService.targetPort }}
+  selector:
+    name: mongo
+---
+# Pacman Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pacman
+  labels:
+    name: pacman
+spec:
+  type: {{ .Values.pacmanService.type }}
+  ports:
+    - port: {{ .Values.pacmanService.port }}
+      targetPort: {{ .Values.pacmanService.targetPort }}
+      protocol: {{ .Values.pacmanService.protocol }}
+  selector:
+    name: pacman
