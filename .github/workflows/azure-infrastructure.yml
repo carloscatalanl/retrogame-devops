@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./terraform
+    working-directory: ./terraform/infrastructure
 
 jobs:
 
