@@ -2,8 +2,8 @@ name: Deploy Infrastructure in Azure
 
 on:
 
-  # push:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ infrastructure ]
 
@@ -60,9 +60,9 @@ jobs:
         with:
           creds: ${{ secrets.AZ_CREDS }}
           # Resource Group Name
-          resource-group:  pacmanRG
+          resource-group: rg-retro_pacman
           # AKS Cluster Name
-          cluster-name:  pacmanAKS
+          cluster-name:  kc_retro_pacman
       - name: Run Helm Deploy
         run: |
           helm upgrade \
