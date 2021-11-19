@@ -1,6 +1,6 @@
 # README
 
-# Pacman Demo Project Team 1
+# Retro Game Demo Project Team 1
 
 ---
 
