@@ -3,7 +3,7 @@ name: Deploy Infrastructure in Azure
 on:
 
   push:
-    branches: [ "main" ]
+    branches: [ "na" ]
   # pull_request:
   #   branches: [ main ]
 

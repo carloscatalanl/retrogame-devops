@@ -2,7 +2,7 @@ name: Deploy terraform backend infrastructure in Azure
 
 on:
   push:
-    branches: [ "na" ]
+    branches: [ "main" ]
   # pull_request:
   #   branches: [ main ]
 
