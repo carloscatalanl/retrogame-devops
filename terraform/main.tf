@@ -1,7 +1,13 @@
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "terraformBackend"
+    storage_account_name = "retrogametf"
+    container_name       = "terraform-state"
+    key                  = "terraform.tfstate"
+  }
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "2.80.0"
     }
   }
