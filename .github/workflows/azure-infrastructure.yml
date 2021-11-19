@@ -4,8 +4,8 @@ on:
 
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ infrastructure ]
+  # pull_request:
+  #   branches: [ infrastructure ]
 
 defaults:
   run:
@@ -62,7 +62,7 @@ jobs:
           # Resource Group Name
           resource-group: rg-retro_pacman
           # AKS Cluster Name
-          cluster-name:  kc_retro_pacman
+          cluster-name: kc_retro_pacman
       - name: Run Helm Deploy
         run: |
           helm upgrade \
@@ -72,4 +72,4 @@ jobs:
             --wait \
             --namespace pacman \
             retropacmanapp \
-            ./helm/ 
+            ./helm
