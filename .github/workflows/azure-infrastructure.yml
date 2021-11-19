@@ -42,3 +42,34 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
+  
+  Helm:
+    runs-on: ubuntu-latest
+    needs: Terraform
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v1
+        with:
+          version: v3.7.1
+
+      - name: Get AKS Credentials
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZ_CREDS }}
+          # Resource Group Name
+          resource-group:  pacmanRG
+          # AKS Cluster Name
+          cluster-name:  pacmanAKS
+      - name: Run Helm Deploy
+        run: |
+          helm upgrade \
+            --install \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace pacman \
+            retropacmanapp \
+            ./helm/ 
