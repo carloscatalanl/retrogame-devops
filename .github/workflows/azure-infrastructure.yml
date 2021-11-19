@@ -2,8 +2,10 @@ name: Deploy Infrastructure in Azure
 
 on:
 
-  pull_request:
-    branches: [ infrastructure ]
+  push:
+    branches: [ test ]
+  # pull_request:
+  #   branches: [ main ]
 
 defaults:
   run:

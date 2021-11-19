@@ -1,9 +1,10 @@
 name: Deploy terraform backend infrastructure in Azure
 
 on:
-
-  pull_request:
-    branches: [ terraform-backend ]
+  push:
+    branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
 
 defaults:
   run:
