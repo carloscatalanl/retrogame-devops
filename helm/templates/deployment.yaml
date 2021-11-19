@@ -18,6 +18,17 @@ spec:
       - image: "{{ .Values.db.image.repository }}"
         imagePullPolicy: {{ .Values.db.image.pullPolicy }}
         name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom: 
+            secretKeyRef:
+              key:  username
+              name: {{ .Release.Name }}-auth
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key:  password
+              name: {{ .Release.Name }}-auth
         ports:
         - name: mongo
           containerPort: {{ .Values.db.image.containerPort }}
@@ -50,6 +61,17 @@ spec:
       - image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: pacman
+        env:
+        - name: MONGO_AUTH_USER
+          valueFrom: 
+            secretKeyRef:
+              key:  username
+              name: {{ .Release.Name }}-auth
+        - name: MONGO_AUTH_PWD
+          valueFrom:
+            secretKeyRef:
+              key:  password
+              name: {{ .Release.Name }}-auth
         ports:
         - containerPort: {{ .Values.image.containerPort }}
           name: http-server
