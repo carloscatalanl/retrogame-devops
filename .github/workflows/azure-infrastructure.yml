@@ -2,13 +2,6 @@ name: Deploy Infrastructure in Azure
 
 on: workflow_dispatch
 
-  # push:
-  #   branches: [ "main" ]
-  # pull_request:
-  #   branches: [ infrastructure ]
-
-
-
 jobs:
 
   Terraform:

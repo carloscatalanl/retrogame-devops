@@ -1,10 +1,6 @@
 name: Deploy terraform backend infrastructure in Azure
 
 on: workflow_dispatch
-  # push:
-  #   branches: [ "na" ]
-  # pull_request:
-  #   branches: [ backend ]
 
 defaults:
   run:
