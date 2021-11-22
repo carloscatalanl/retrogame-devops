@@ -51,3 +51,9 @@ resource "azurerm_storage_container" "asc" {
   storage_account_name  = azurerm_storage_account.asa.name
   container_access_type = "blob"
 }
+
+resource "azurerm_storage_container" "vault" {
+  name                  = var.asc_vault_name
+  storage_account_name  = azurerm_storage_account.asa.name
+  container_access_type = "blob"
+}
