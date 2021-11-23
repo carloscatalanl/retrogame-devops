@@ -35,7 +35,7 @@ resource "azurerm_storage_account" "asa" {
   name                     = var.asa_name
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
+  account_tier             = "Premium"
   account_replication_type = "GRS"
   allow_blob_public_access = true
 
@@ -52,8 +52,8 @@ resource "azurerm_storage_container" "asc" {
   container_access_type = "blob"
 }
 
-# resource "azurerm_storage_container" "vault" {
-#   name                  = var.asc_vault_name
-#   storage_account_name  = azurerm_storage_account.asa.name
-#   container_access_type = "blob"
-# }
+resource "azurerm_storage_container" "vault" {
+  name                  = var.asc_vault_name
+  storage_account_name  = azurerm_storage_account.asa.name
+  container_access_type = "blob"
+}
