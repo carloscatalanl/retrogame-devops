@@ -80,6 +80,7 @@ jobs:
 
       - name: Install Helm
         uses: Azure/setup-helm@v1
+
         with:
           version: v3.7.1
 
@@ -100,6 +101,12 @@ jobs:
             --wait \
             --namespace pacman \
             retropacmanapp \
-            .
+            . \
+            --set username=$MONGO_AUTH_USER \
+            --set password=$MONGO_AUTH_PWD
+        env:
+          MONGO_AUTH_USER: ${{ secrets.MONGO_USER }}
+          MONGO_AUTH_PWD: ${{ secrets.MONGO_PWD }}
+
 
 
