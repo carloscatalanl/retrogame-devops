@@ -46,10 +46,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Ask for ACR admin password
-      run: |
-        echo "ACR Password: ${{ github.event.inputs.ACR_PASSWORD }}" 
 
     - name: Build the Docker image
       run: docker build -t pacman-app .
@@ -60,7 +56,7 @@ jobs:
         # Container registry username
         username: ${{ secrets.ACR_USER }}
         # Container registry password
-        password: ${{ github.event.inputs.ACR_PASSWORD }}
+        password: ${{ secrets.ACR_PASSWORD }}
         # Container registry server url
         login-server: ${{ secrets.ACR_SERVER }}
       
