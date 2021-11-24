@@ -56,3 +56,18 @@ resource "azurerm_role_assignment" "kubweb_to_acr" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.kubernetes_cluster.kubelet_identity[0].object_id
 }
+
+output "admin_pass" {
+  value = azurerm_container_registry.acr.admin_password
+  sensitive = true
+}
+
+output "admin_username" {
+  value = azurerm_container_registry.acr.admin_username
+  sensitive = true
+}
+
+output "login_server" {
+  value = azurerm_container_registry.acr.login_server
+  sensitive = true
+}
