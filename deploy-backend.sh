@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# Working dic.
+# Working dic
 cd terraform/backend/
 
 # Terraform
