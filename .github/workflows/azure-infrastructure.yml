@@ -45,9 +45,6 @@ jobs:
 
       - name: Proof
         run: terraform output -json >> terraform-output.json
-      
-      - name: Proof2
-        run: cat terraform-output
 
       - name: Extract version from package.json
         uses: sergeysova/jq-action@v2
