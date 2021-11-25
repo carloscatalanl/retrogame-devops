@@ -41,12 +41,11 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
+     
+      - name: Proof
+        run: terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'
       
-      - name: Extract version from package.json
-        uses: sergeysova/jq-action@v2
-        id: version
-        with:
-          cmd: 'terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"''
+
 
   # Release:
     
