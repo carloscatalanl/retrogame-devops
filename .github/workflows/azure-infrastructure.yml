@@ -8,8 +8,7 @@ on:
 
 jobs:
 
-  Terraform:
-
+  Infrastructure:
     runs-on: ubuntu-latest
 
     defaults:
@@ -69,12 +68,12 @@ jobs:
           login-server: ${{ env.ACR_SERVER }}
         
       - name: Tag Docker image
-        run: docker tag pacman-app ${{ secrets.ACR_SERVER }}/pacman-app
+        run: docker tag pacman-app ${{ env.ACR_SERVER }}/pacman-app
       
       - name: Push Docker image into ACR
-        run: docker push ${{ secrets.ACR_SERVER }}/pacman-app         
+        run: docker push ${{ env.ACR_SERVER }}/pacman-app         
 
-  Helm:
+  Cluster:
     runs-on: ubuntu-latest
     needs: Terraform
 
