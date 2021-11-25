@@ -47,6 +47,10 @@ jobs:
 
       - name: Test
         run: echo ${{ env.ACR_PASSWORD }}
+      - name: Test2
+        run: echo 'Hola pirata'
+      - name: Test2
+        run: echo ${{ secrets.ACR_USER }}
 
       # - name: Build the Docker image
       #   run: docker build -t pacman-app ...
