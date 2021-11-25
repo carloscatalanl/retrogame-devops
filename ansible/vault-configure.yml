@@ -1,0 +1,110 @@
+---
+  - name: Install & Configure Vault
+    hosts: all
+    become: yes
+
+    vars:
+      vault_version: 1.9.0
+      directories:
+        - /etc/vault
+        - /var/lib/vault/data
+      directoriesOwner:
+        - /etc/vault
+        - /var/lib/vault
+    
+    tasks:
+      - name: Get Apt Key from Hashicorp
+        ansible.builtin.apt_key:
+          url: https://apt.releases.hashicorp.com/gpg
+          state: present
+
+      - name: Add Repository from Hashicorp Release {{ ansible_lsb.codename }}
+        ansible.builtin.apt_repository:
+          update_cache: yes
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
+          state: present
+          
+
+      - name: Update repositories cache and install Unzip & "vault" package
+        apt:
+          update_cache: yes
+          name: "{{ item }}"
+        loop:
+          - vault
+          - unzip
+          
+      - name: Download Vault binary
+        uri:
+          dest: /home
+          url: "https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip"
+          
+
+      - name: Extract vault*.zip" into /usr/local/bin/
+        ansible.builtin.unarchive:
+          remote_src: yes
+          src: "/home/vault_{{vault_version}}_linux_amd64.zip"
+          dest: /usr/local/bin/
+
+      - name: Remove Vault zip
+        ansible.builtin.file:
+          path: "/home/vault_{{vault_version}}_linux_amd64.zip"
+          state: absent
+
+
+      - name: Create two directories for Vault
+        ansible.builtin.file:
+          path: "{{item}}"
+          state: directory
+          mode: '0755'
+          recurse: yes
+        with_items: "{{ directories }}"
+
+      - name: Create vault user
+        ansible.builtin.user:
+          name: vault
+          home: /etc/vault
+          groups:
+            - sudo
+          shell: /bin/false
+          system: yes
+      
+      - name: Give ownership to Vault of binaries+
+        ansible.builtin.file:
+          path: "{{item}}"
+          state: directory
+          recurse: yes
+          owner: vault
+          group: vault
+          mode: '0766'
+        with_items: "{{ directoriesOwner }}"
+
+      - name: Copy vault service file
+        ansible.builtin.copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+          owner: vault
+          group: vault
+          mode: '0766'
+        with_items:
+          - { src: './vault.service', dest: '/etc/systemd/system/vault.service' }
+          - { src: './config.hcl', dest: '/etc/vault/config.hcl' }
+
+      - name: Export IP to ansible
+        ansible.builtin.lineinfile:
+          path: /etc/environment
+          insertafter: EOF
+          state: present
+          line: 'VAULT_ADDR="http://{{ inventory_hostname }}:8200"' 
+
+      - name: Remove Vault data
+        ansible.builtin.file:
+          path: /var/lib/vault/data
+          state: absent
+          force: yes
+
+      - name: Init Vault
+        ansible.builtin.systemd:
+          state: started
+          daemon_reload: yes
+          name: vault
+          enabled: yes
