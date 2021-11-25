@@ -46,7 +46,7 @@ jobs:
             # terraform output -json | jq -r '@sh "export ACR_SERVER=\(.login_server.value)"'
 
       - name: Test
-        run: echo $ACR_PASSWORD
+        run: echo ${{ env.ACR_PASSWORD }}
 
       - name: Build the Docker image
         run: docker build -t pacman-app ...
