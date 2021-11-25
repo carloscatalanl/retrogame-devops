@@ -40,8 +40,9 @@ jobs:
       
       - name: Export ACR password
         uses: sergeysova/jq-action@v2
-        with:
-          cmd: terraform output -json | jq -r '@sh "export ACR_PASSWORD=\(.admin_pass.value)"'
+        run: terraform output -json | jq -r '@sh "export ACR_PASS=\(.admin_pass.value)"'
+        # with:
+        #   cmd: terraform output -json | jq -r '@sh "export ACR_PASSWORD=\(.admin_pass.value)"'
             # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)"'
             # terraform output -json | jq -r '@sh "export ACR_SERVER=\(.login_server.value)"'
 
