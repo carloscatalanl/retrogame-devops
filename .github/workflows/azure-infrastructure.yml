@@ -1,10 +1,6 @@
 name: Deploy Infrastructure in Azure
 
 on: workflow_dispatch
-# on:
-#    push:
-#     branches:
-#       - main
 
 jobs:
 
@@ -108,9 +104,11 @@ jobs:
             . \
             --set username=$MONGO_AUTH_USER \
             --set password=$MONGO_AUTH_PWD
+
         env:
           MONGO_AUTH_USER: ${{ secrets.MONGO_USER }}
           MONGO_AUTH_PWD: ${{ secrets.MONGO_PWD }}
-
-
-
+          # EXTERNAL_VAULT_ADDR:
+          # TOKEN_VAULT:
+            # --set token=$TOKEN_VAULT \
+            # --set external_vault_address=$EXTERNAL_VAULT_ADDR
