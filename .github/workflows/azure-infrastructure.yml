@@ -75,7 +75,7 @@ jobs:
 
   Cluster:
     runs-on: ubuntu-latest
-    needs: Terraform
+    needs: Infrastructure
 
     defaults:
       run:
