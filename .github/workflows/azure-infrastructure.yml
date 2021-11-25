@@ -46,8 +46,11 @@ jobs:
       - name: Proof
         run: terraform output -json >> terraform-output
       
-      - name: Proof
-        run: jq '.login_server.value' terraform-output
+      - name: Proof2
+        run: cat terraform-output
+      
+      # - name: Proof3
+      #   run: jq '.login_server.value' terraform-output
       
       
         # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'

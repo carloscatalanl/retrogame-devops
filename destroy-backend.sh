@@ -1,7 +1,13 @@
 #!/bin/bash 
 
-# Working dic
-cd terraform/backend/
+# Infrastructure 
+cd terraform/infrastructure/
+terraform destroy -auto-approve
 
-# Terraform
+# Vault
+cd ../vault/
+terraform destroy -auto-approve
+
+# Backend
+cd ../backend/
 terraform destroy -auto-approve
