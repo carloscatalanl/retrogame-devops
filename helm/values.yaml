@@ -4,6 +4,7 @@
 
 username: root
 password: password
+token: root
 
 replicaCount: 1
 
