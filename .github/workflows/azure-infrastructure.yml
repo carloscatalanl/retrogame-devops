@@ -44,7 +44,7 @@ jobs:
     
 
       - name: Proof
-        run: terraform output -json >> terraform-output
+        run: terraform output -json >> terraform-output.json
       
       - name: Proof2
         run: cat terraform-output
@@ -53,7 +53,7 @@ jobs:
         uses: sergeysova/jq-action@v2
         id: version
         with:
-          cmd: 'jq .login_server.value terraform-output -r'
+          cmd: 'jq .login_server.value terraform-output.json -r'
       
       # - name: Proof3
       #   run: jq .login_server.value -r terraform-output
