@@ -48,9 +48,12 @@ jobs:
 
       - name: Extract version from package.json
         uses: sergeysova/jq-action@v2
-        id: version
+        id: login_server.value
         with:
-          cmd: 'jq .login_server.value terraform-output.json -r'
+          cmd: 'jq .login_server.value package.json -r'
+      
+      - name: Show my version
+        run: 'echo "login_server.value ${{ steps.login_server.value.outputs.value }}"'
       
       # - name: Proof3
       #   run: jq .login_server.value -r terraform-output
