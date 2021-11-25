@@ -35,13 +35,14 @@ resource "azurerm_storage_account" "asa" {
   name                     = var.asa_name
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
-  account_tier             = "Premium"
+  account_tier             = "Standard"
   account_replication_type = "GRS"
   allow_blob_public_access = true
 
-   network_rules {
-    default_action             = "Deny"
-    ip_rules                   = ["100.0.0.1"]
+  network_rules {
+    default_action = "Allow"
+    // ip_rules                   = ["187.158.1.252"]
+    // ip_rules                   = ["100.0.0.1"]
     virtual_network_subnet_ids = [azurerm_subnet.subnet.id]
   }
 }
