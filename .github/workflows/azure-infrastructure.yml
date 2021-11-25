@@ -37,13 +37,21 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
+      
+      - name: Terraform Apply
+        run: apt get update 
+      - name: Terraform Apply
+        run: apt get install jq 
 
       - name: Export ACR password
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: terraform output -json | jq -r '@sh "export ACR_PASSWORD=\(.admin_pass.value)"'
-            # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)"'
-            # terraform output -json | jq -r '@sh "export ACR_SERVER=\(.login_server.value)"'
+        run: terraform output -json | jq -r '@sh "export ACR_PASS=\(.admin_pass.value)"'
+
+      # - name: Export ACR password
+      #   uses: sergeysova/jq-action@v2
+      #   with:
+      #     cmd: terraform output -json | jq -r '@sh "export ACR_PASSWORD=\(.admin_pass.value)"'
+      #       # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)"'
+      #       # terraform output -json | jq -r '@sh "export ACR_SERVER=\(.login_server.value)"'
 
       - name: Test
         run: echo $ACR_PASSWORD
