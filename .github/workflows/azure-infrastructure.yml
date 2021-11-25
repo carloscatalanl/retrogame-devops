@@ -43,98 +43,75 @@ jobs:
         run: terraform apply --auto-approve -lock=false
     
 
-      - name: Proof
-        run: terraform output -json >> terraform-output.json
-
-      
-      
-      - name: Proof3
+      - name: Export output values to env variables
         run: |
-          content=`cat ./terraform-output.json`
-          # the following lines are only required for multi line json
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          # end of optional handling for multi line json
-          echo "::set-output name=packageJson::$content"
+          terraform output -json > terraform-output-values
+          cat  terraform-output-values | grep value > terraform-sed-aux
+          sed 's/"value": "//' terraform-sed-aux >  terraform-output-values
+          sed 's/.$//'  terraform-output-values > terraform-sed-aux
+          sed 's/ //g' terraform-sed-aux >  terraform-output-values
+          ACR_SERVER=$(sed -n 1p  terraform-output-values)
+          ACR_USER=$(sed -n 2p  terraform-output-values)
+          ACR_PASSWORD=$(sed -n 3p  terraform-output-values)
+          rm terraform-output-values terraform-sed-aux
 
-      - name: Proof4
+      - name: Build the Docker image
+        run: docker build -t pacman-app .
+
+      - name: Azure Container Registry Login
+        uses: Azure/docker-login@v1
+        with:
+          # Container registry username
+          username: ${{ env.ACR_USER }}
+          # Container registry password
+          password: ${{ env.ACR_PASSWORD }}
+          # Container registry server url
+          login-server: ${{ env.ACR_SERVER }}
+        
+      - name: Tag Docker image
+        run: docker tag pacman-app ${{ secrets.ACR_SERVER }}/pacman-app
+      
+      - name: Push Docker image into ACR
+        run: docker push ${{ secrets.ACR_SERVER }}/pacman-app         
+
+  Helm:
+    runs-on: ubuntu-latest
+    needs: Terraform
+
+    defaults:
+      run:
+        working-directory: ./helm
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v1
+
+        with:
+          version: v3.7.1
+
+      - name: Get AKS Credentials
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZ_CREDS }}
+          # Resource Group Name
+          resource-group: rg-retro_pacman
+          # AKS Cluster Name
+          cluster-name: kc_retro_pacman
+      - name: Run Helm Deploy
         run: |
-          echo "${{fromJson(steps.set_var.outputs.packageJson).version}}"
-      
-        # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'
-      
-
-
-  # Release:
-    
-  #   needs: Terraform
-    
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #   - uses: actions/checkout@v2
-
-  #   - name: Build the Docker image
-  #     run: docker build -t pacman-app .
-
-  #   - name: Azure Container Registry Login
-  #     uses: Azure/docker-login@v1
-  #     with:
-  #       # Container registry username
-  #       username: ${{ secrets.ACR_USER }}
-  #       # Container registry password
-  #       password: ${{ secrets.ACR_PASSWORD }}
-  #       # Container registry server url
-  #       login-server: ${{ secrets.ACR_SERVER }}
-      
-  #   - name: Tag Docker image
-  #     run: docker tag pacman-app ${{ secrets.ACR_SERVER }}/pacman-app
-    
-  #   - name: Push Docker image into ACR
-  #     run: docker push ${{ secrets.ACR_SERVER }}/pacman-app      
-
-  # Helm:
-  #   runs-on: ubuntu-latest
-  #   needs: Release
-
-  #   defaults:
-  #     run:
-  #       working-directory: ./helm
-
-  #   steps:
-
-  #     - uses: actions/checkout@v2
-
-  #     - name: Install Helm
-  #       uses: Azure/setup-helm@v1
-
-  #       with:
-  #         version: v3.7.1
-
-  #     - name: Get AKS Credentials
-  #       uses: Azure/aks-set-context@v1
-  #       with:
-  #         creds: ${{ secrets.AZ_CREDS }}
-  #         # Resource Group Name
-  #         resource-group: rg-retro_pacman
-  #         # AKS Cluster Name
-  #         cluster-name: kc_retro_pacman
-  #     - name: Run Helm Deploy
-  #       run: |
-  #         helm upgrade \
-  #           --install \
-  #           --create-namespace \
-  #           --atomic \
-  #           --wait \
-  #           --namespace pacman \
-  #           retropacmanapp \
-  #           . \
-  #           --set username=$MONGO_AUTH_USER \
-  #           --set password=$MONGO_AUTH_PWD
-  #       env:
-  #         MONGO_AUTH_USER: ${{ secrets.MONGO_USER }}
-  #         MONGO_AUTH_PWD: ${{ secrets.MONGO_PWD }}
-
-
-
+          helm upgrade \
+            --install \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace pacman \
+            retropacmanapp \
+            . \
+            --set username=$MONGO_AUTH_USER \
+            --set password=$MONGO_AUTH_PWD
+        env:
+          MONGO_AUTH_USER: ${{ secrets.MONGO_USER }}
+          MONGO_AUTH_PWD: ${{ secrets.MONGO_PWD }}
