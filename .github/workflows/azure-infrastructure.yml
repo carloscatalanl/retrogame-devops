@@ -46,14 +46,21 @@ jobs:
       - name: Proof
         run: terraform output -json >> terraform-output.json
 
-      - name: Extract version from package.json
-        uses: edwardgeorge/jq-action@main
-        with:
-          input: terraform-output.json
-          script: "[.admin_pass.value]"
       
-      # - name: Proof3
-      #   run: jq .login_server.value -r terraform-output
+      
+      - name: Proof3
+        run: |
+          content=`cat ./path/to/package.json`
+          # the following lines are only required for multi line json
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          # end of optional handling for multi line json
+          echo "::set-output name=packageJson::$content"
+
+      - name: Proof4
+        run: |
+          echo "${{fromJson(steps.set_var.outputs.packageJson).version}}"
       
         # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'
       
