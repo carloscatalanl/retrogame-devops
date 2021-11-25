@@ -47,13 +47,10 @@ jobs:
         run: terraform output -json >> terraform-output.json
 
       - name: Extract version from package.json
-        uses: sergeysova/jq-action@v2
-        id: login_server.value
+        uses: edwardgeorge/jq-action@main
         with:
-          cmd: 'jq .login_server.value package.json -r'
-      
-      - name: Show my version
-        run: 'echo "login_server.value ${{ steps.login_server.value.outputs.value }}"'
+          input: terraform-output.json
+          script: "[.admin_pass.value]"
       
       # - name: Proof3
       #   run: jq .login_server.value -r terraform-output
