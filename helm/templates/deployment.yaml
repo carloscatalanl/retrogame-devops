@@ -69,7 +69,10 @@ spec:
               name: {{ .Release.Name }}-auth
 
         - name: VAULT_ADDR
-          value: "http://$EXTERNAL_VAULT_ADDR:8200"
+          valueFrom:
+            secretKeyRef:
+              key:  external_vault_address
+              name: {{ .Release.Name }}-auth
         - name: VAULT_TOKEN
           valueFrom:
             secretKeyRef:
