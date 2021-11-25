@@ -50,7 +50,7 @@ jobs:
       
       - name: Proof3
         run: |
-          content=`cat ./path/to/package.json`
+          content=`cat ./terraform-output.json`
           # the following lines are only required for multi line json
           content="${content//'%'/'%25'}"
           content="${content//$'\n'/'%0A'}"
