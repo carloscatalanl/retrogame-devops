@@ -41,12 +41,10 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
-     
-      - name: Proof
-        run: terraform output -json 
+    
 
       - name: Proof
-        run: jq --version
+        run: jterraform output -json | jq '.login_server.value'
       
       
         # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'
