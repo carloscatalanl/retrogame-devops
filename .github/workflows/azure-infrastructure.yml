@@ -48,12 +48,15 @@ jobs:
       
       - name: Proof2
         run: cat terraform-output
+
+      - name: Extract version from package.json
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: 'jq .login_server.value terraform-output -r'
       
-      - name: Proof3
-        run: jq .login_server.value -r terraform-output
-      
-      - name: Proof3
-        run: jq .login_server.value terraform-output
+      # - name: Proof3
+      #   run: jq .login_server.value -r terraform-output
       
         # terraform output -json | jq -r '@sh "export ACR_USER=\(.admin_username.value)\nexport ACR_PASSWORD=\(.admin_pass.value)\nexport ACR_LOGIN=\(.login_server.value)"'
       
