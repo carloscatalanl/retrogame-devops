@@ -1,0 +1,163 @@
+---
+  - name: Install & Configure Vault
+    hosts: all
+    become: yes
+
+    vars:
+      vault_version: 1.9.0
+      directories:
+        - /etc/vault
+        - /var/lib/vault/data
+      directoriesOwner:
+        - /etc/vault
+        - /var/lib/vault
+      unseal_keys_dir_output: /home/keys
+      root_token_dir_output: /home/token
+    
+    tasks:
+      - name: Get Apt Key from Hashicorp
+        ansible.builtin.apt_key:
+          url: https://apt.releases.hashicorp.com/gpg
+          state: present
+
+      - name: Add Repository from Hashicorp Release {{ ansible_lsb.codename }}
+        ansible.builtin.apt_repository:
+          update_cache: yes
+          repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
+          state: present
+          
+
+      - name: Update repositories cache and install Unzip & "vault" package
+        apt:
+          update_cache: yes
+          name: "{{ item }}"
+        loop:
+          - vault
+          - unzip
+          
+      - name: Download Vault binary
+        uri:
+          dest: /home
+          url: "https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip"
+          
+
+      - name: Extract vault*.zip" into /usr/local/bin/
+        ansible.builtin.unarchive:
+          remote_src: yes
+          src: "/home/vault_{{vault_version}}_linux_amd64.zip"
+          dest: /usr/local/bin/
+
+      - name: Remove Vault zip
+        ansible.builtin.file:
+          path: "/home/vault_{{vault_version}}_linux_amd64.zip"
+          state: absent
+
+
+      - name: Create two directories for Vault
+        ansible.builtin.file:
+          path: "{{item}}"
+          state: directory
+          mode: '0755'
+          recurse: yes
+        with_items: "{{ directories }}"
+
+      - name: Create vault user
+        ansible.builtin.user:
+          name: vault
+          home: /etc/vault
+          groups:
+            - sudo
+          shell: /bin/false
+          system: yes
+      
+      - name: Give ownership to Vault of binaries+
+        ansible.builtin.file:
+          path: "{{item}}"
+          state: directory
+          recurse: yes
+          owner: vault
+          group: vault
+          mode: '0766'
+        with_items: "{{ directoriesOwner }}"
+
+      - name: Copy vault service file
+        ansible.builtin.copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+          owner: vault
+          group: vault
+          mode: '0766'
+        with_items:
+          - { src: './vault.service', dest: '/etc/systemd/system/vault.service' }
+          - { src: './config.hcl', dest: '/etc/vault/config.hcl' }
+
+      - name: Export IP to ansible
+        ansible.builtin.lineinfile:
+          path: /etc/environment
+          insertafter: EOF
+          state: present
+          line: 'VAULT_ADDR="http://{{ inventory_hostname }}:8200"' 
+
+      - name: Remove Vault data
+        ansible.builtin.file:
+          path: /var/lib/vault/data
+          state: absent
+          force: yes
+
+      - name: Start Vault Service
+        ansible.builtin.systemd:
+          state: started
+          daemon_reload: yes
+          name: vault
+          enabled: yes
+
+      - name: Create unseal directories
+        file:
+            path: "{{ unseal_keys_dir_output }}"
+            state: directory
+            
+      - name: Create root key directories
+        file:
+            path: "{{ root_token_dir_output }}"
+            state: directory
+            
+      - name: Initialise Vault operator
+        shell: vault operator init -key-shares=5 -key-threshold=3 -format json
+        environment:
+            VAULT_ADDR: "http://127.0.0.1:8200"
+        register: vault_init_results
+
+      - name: Parse output of vault init
+        set_fact:
+            vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+        
+      - name: Write unseal keys to files
+        copy:
+            dest: "{{ unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+            content: "{{ item.1 }}"
+        with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
+            
+      - name: Write root token to file
+        copy:
+            content: "{{ vault_init_parsed.root_token }}"
+            dest: "{{root_token_dir_output}}/rootkey"
+
+      - name: Get all keys files
+        find:
+          paths: "{{ unseal_keys_dir_output }}/"
+          file_type: file
+          recurse: yes
+        register: keys
+
+      - name: Reading unseal key contents
+        ansible.builtin.shell: cat {{item.path}}
+        register: unseal_keys
+        with_items:
+          - "{{keys.files}}"
+        
+      - name: Unseal vault with unseal keys
+        shell: |
+            vault operator unseal {{ item.stdout }}
+        environment:
+            VAULT_ADDR: "http://127.0.0.1:8200"
+        with_items: "{{unseal_keys.results}}" 
