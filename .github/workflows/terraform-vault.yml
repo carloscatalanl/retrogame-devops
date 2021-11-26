@@ -7,6 +7,8 @@ jobs:
   Terraform:
 
     runs-on: ubuntu-latest
+    outputs:
+      rsa-pub: ${{ steps.rsa.outputs.tf-rsa }}
 
     defaults:
       run:
@@ -33,8 +35,8 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -lock=false
+        run: terraform plan -var admin_password=${{secrets.VM_PASSWORD}} -lock=false
         
       - name: Terraform Apply
-        run: terraform apply --auto-approve -lock=false
-  
+        run: terraform apply -var admin_password=${{secrets.VM_PASSWORD}} --auto-approve -lock=false
+    

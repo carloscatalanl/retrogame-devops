@@ -133,33 +133,32 @@ provider "azurerm" {
       private_ip_address_allocation = "Dynamic"
     }
   }
-  
+    
   # Virtual Machine
   resource "azurerm_linux_virtual_machine" "my_vm" {
-    name                = "myVM"
+    name                = "vault-VM"
     resource_group_name = var.rg_name
     location            = var.location
     size                = "Standard_F2"
     admin_username      = "azureuser"
+    admin_password = var.admin_password
+    disable_password_authentication = false
     network_interface_ids = [
       azurerm_network_interface.main.id,
       azurerm_network_interface.internal.id,
     ]
-  
-    admin_ssh_key {
-      username   = "azureuser"
-      public_key = file("~/.ssh/id_rsa.pub")
-    }
-  
+
+    
     os_disk {
       caching              = "ReadWrite"
       storage_account_type = "Standard_LRS"
     }
+
   
     source_image_reference {
       publisher = "Canonical"
       offer     = "UbuntuServer"
-      sku       = "16.04-LTS"
+      sku       = "18.04-LTS"
       version   = "latest"
     }
   }

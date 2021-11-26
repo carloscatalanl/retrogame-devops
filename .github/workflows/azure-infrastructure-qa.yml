@@ -1,4 +1,4 @@
-name: Deploy Infrastructure in Azure
+name: Deploy QA Infrastructure in Azure
 
 on: workflow_dispatch
 
@@ -10,7 +10,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./terraform/infrastructure
+        working-directory: ./terraform/infrastructure-qa
     env:
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
       ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
@@ -48,23 +48,23 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build the Docker image
-      run: docker build -t pacman-app ./terraform/infrastructure/
+      run: docker build -t pacman-app ./terraform/infrastructure-qa/
 
     - name: Azure Container Registry Login
       uses: Azure/docker-login@v1
       with:
         # Container registry username
-        username: ${{ secrets.ACR_USER }}
+        username: ${{ secrets.ACR_USER_TEST }}
         # Container registry password
-        password: ${{ secrets.ACR_PASSWORD }}
+        password: ${{ secrets.ACR_PASSWORD_TEST }}
         # Container registry server url
-        login-server: ${{ secrets.ACR_SERVER }}
+        login-server: ${{ secrets.ACR_SERVER_TEST }}
       
     - name: Tag Docker image
-      run: docker tag pacman-app ${{ secrets.ACR_SERVER }}/pacman-app
+      run: docker tag pacman-app ${{ secrets.ACR_SERVER_TEST }}/pacman-app
     
     - name: Push Docker image into ACR
-      run: docker push ${{ secrets.ACR_SERVER }}/pacman-app      
+      run: docker push ${{ secrets.ACR_SERVER_TEST }}/pacman-app      
 
   Helm:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./helm
+        working-directory: ./helm-qa
 
     steps:
 
@@ -89,9 +89,9 @@ jobs:
         with:
           creds: ${{ secrets.AZ_CREDS }}
           # Resource Group Name
-          resource-group: rg-retro_pacman
+          resource-group: rg-retro_pacman-test
           # AKS Cluster Name
-          cluster-name: kc_retro_pacman
+          cluster-name: kc_retro_pacman_test
       - name: Run Helm Deploy
         run: |
           helm upgrade \

@@ -20,4 +20,8 @@ variable "asc_vault_name" {
   description = "Variable to set the Azure Storage Container Vault name"
 }
 
+variable "asc_test_name" {
+  type        = string
+  description = "Variable to set the Azure Storage Container Test name"
+}
 
