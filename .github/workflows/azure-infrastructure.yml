@@ -9,6 +9,7 @@ on:
 jobs:
 
   Infrastructure:
+
     runs-on: ubuntu-latest
 
     defaults:
@@ -19,6 +20,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+      ACR_USER: FOO
 
     steps:
       - uses: actions/checkout@v2
@@ -84,7 +86,9 @@ jobs:
         run: docker tag pacman-app echo ${{ env.ACR_USER }}/pacman-app
       
       - name: Push Docker image into ACR
-        run: docker push $ACR_SERVER/pacman-app         
+        run: docker push $ACR_SERVER/pacman-app     
+
+          
 
   Cluster:
     runs-on: ubuntu-latest
