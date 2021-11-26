@@ -56,6 +56,9 @@ jobs:
           rm aux
       
       - name: Debug
+        run: cat public-ip
+
+      - name: Debug2
         run: cat ./ansible/inventory.in
 
       - name: Run Ansible
