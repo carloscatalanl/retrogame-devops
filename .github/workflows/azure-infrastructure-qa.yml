@@ -1,0 +1,110 @@
+name: Deploy QA Infrastructure in Azure
+
+on: workflow_dispatch
+
+jobs:
+
+  Terraform:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform/infrastructure-qa
+    env:
+      ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
+      ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
+      ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+      ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform Format
+        run: terraform fmt
+        
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -lock=false
+        
+      - name: Terraform Apply
+        run: terraform apply --auto-approve -lock=false
+
+  Release:
+    
+    needs: Terraform
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build the Docker image
+      run: docker build -t pacman-app ./terraform/infrastructure-qa/
+
+    - name: Azure Container Registry Login
+      uses: Azure/docker-login@v1
+      with:
+        # Container registry username
+        username: ${{ secrets.ACR_USER_TEST }}
+        # Container registry password
+        password: ${{ secrets.ACR_PASSWORD_TEST }}
+        # Container registry server url
+        login-server: ${{ secrets.ACR_SERVER_TEST }}
+      
+    - name: Tag Docker image
+      run: docker tag pacman-app ${{ secrets.ACR_SERVER_TEST }}/pacman-app
+    
+    - name: Push Docker image into ACR
+      run: docker push ${{ secrets.ACR_SERVER_TEST }}/pacman-app      
+
+  Helm:
+    runs-on: ubuntu-latest
+    needs: Release
+
+    defaults:
+      run:
+        working-directory: ./helm-qa
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v1
+
+        with:
+          version: v3.7.1
+
+      - name: Get AKS Credentials
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZ_CREDS }}
+          # Resource Group Name
+          resource-group: rg-retro_pacman
+          # AKS Cluster Name
+          cluster-name: kc_retro_pacman
+      - name: Run Helm Deploy
+        run: |
+          helm upgrade \
+            --install \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace pacman \
+            retropacmanapp \
+            . \
+            --set username=$MONGO_AUTH_USER \
+            --set password=$MONGO_AUTH_PWD
+
+        env:
+          MONGO_AUTH_USER: ${{ secrets.MONGO_USER }}
+          MONGO_AUTH_PWD: ${{ secrets.MONGO_PWD }}

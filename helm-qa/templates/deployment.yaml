@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mongo
+  template:
+    metadata:
+      labels:
+        name: mongo
+    spec:
+      containers:
+      - image: "{{ .Values.db.image.repository }}"
+        imagePullPolicy: {{ .Values.db.image.pullPolicy }}
+        name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom: 
+            secretKeyRef:
+              key:  username
+              name: {{ .Release.Name }}-auth
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key:  password
+              name: {{ .Release.Name }}-auth
+        ports:
+        - name: mongo
+          containerPort: {{ .Values.db.image.containerPort }}
+        volumeMounts:
+          - name: mongo-db
+            mountPath: /data/db
+      volumes:
+        - name: mongo-db
+          persistentVolumeClaim:
+            claimName: mongo-storage
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: pacman
+  name: pacman
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        name: pacman
+  template:
+    metadata:
+      labels:
+        name: pacman
+    spec:
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: pacman
+        env:
+        - name: MONGO_AUTH_USER
+          valueFrom: 
+            secretKeyRef:
+              key:  username
+              name: {{ .Release.Name }}-auth
+
+        - name: VAULT_ADDR
+          valueFrom:
+            secretKeyRef:
+              key:  external_vault_address
+              name: {{ .Release.Name }}-auth
+        - name: VAULT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key:  token
+              name: {{ .Release.Name }}-auth
+
+        - name: MONGO_AUTH_PWD
+          valueFrom:
+            secretKeyRef:
+              key:  password
+              name: {{ .Release.Name }}-auth
+        ports:
+        - containerPort: {{ .Values.image.containerPort }}
+          name: http-server
