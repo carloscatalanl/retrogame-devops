@@ -136,7 +136,7 @@ provider "azurerm" {
   
   # Virtual Machine
   resource "azurerm_linux_virtual_machine" "my_vm" {
-    name                = "myVM"
+    name                = "vault-VM"
     resource_group_name = var.rg_name
     location            = var.location
     size                = "Standard_F2"
@@ -148,7 +148,7 @@ provider "azurerm" {
   
     admin_ssh_key {
       username   = "azureuser"
-      public_key = file("~/.ssh/id_rsa.pub")
+      public_key = file("./vault_rsa.pub")
     }
   
     os_disk {
@@ -159,7 +159,7 @@ provider "azurerm" {
     source_image_reference {
       publisher = "Canonical"
       offer     = "UbuntuServer"
-      sku       = "16.04-LTS"
+      sku       = "18.04-LTS"
       version   = "latest"
     }
   }

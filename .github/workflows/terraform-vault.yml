@@ -7,6 +7,8 @@ jobs:
   Terraform:
 
     runs-on: ubuntu-latest
+    outputs:
+      rsa-pub: ${{ steps.rsa.outputs.tf-rsa }}
 
     defaults:
       run:
@@ -37,4 +39,7 @@ jobs:
         
       - name: Terraform Apply
         run: terraform apply --auto-approve -lock=false
+      
+      - id: rsa
+        run: echo "::set-output name=tf-rsa::cat ./vault_rsa.pub"
   
