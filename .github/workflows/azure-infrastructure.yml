@@ -72,7 +72,10 @@ jobs:
         
       - name: Proof
         run: echo $ACR_USER
-        
+
+      - name: Proof
+        run: echo ${{ env.ACR_USER }}
+
       - name: Tag Docker image
         run: docker tag pacman-app $ACR_SERVER/pacman-app
       
