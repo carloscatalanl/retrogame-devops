@@ -77,17 +77,11 @@ jobs:
         run: echo $ACR_USER
 
       - name: Proof
-        run: ACR_SERVER=$(sed -n 1p  terraform-output-values)
-      
-      - name: Proof
-        run: echo $ACR_USER
+        run: echo ${{ env.ACR_USER }}
 
-
-      - name: Proof
-        run: cat terraform-output-values
 
       - name: Tag Docker image
-        run: docker tag pacman-app $ACR_SERVER/pacman-app
+        run: docker tag pacman-app echo ${{ env.ACR_USER }}/pacman-app
       
       - name: Push Docker image into ACR
         run: docker push $ACR_SERVER/pacman-app         
