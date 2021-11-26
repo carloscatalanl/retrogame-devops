@@ -61,17 +61,17 @@ jobs:
         uses: Azure/docker-login@v1
         with:
           # Container registry username
-          username: ${{ env.ACR_USER }}
+          username: $ACR_USER
           # Container registry password
-          password: ${{ env.ACR_PASSWORD }}
+          password: $ACR_PASSWORD
           # Container registry server url
-          login-server: ${{ env.ACR_SERVER }}
+          login-server: $ACR_SERVER
         
       - name: Tag Docker image
-        run: docker tag pacman-app ${{ env.ACR_SERVER }}/pacman-app
+        run: docker tag pacman-app $ACR_SERVER/pacman-app
       
       - name: Push Docker image into ACR
-        run: docker push ${{ env.ACR_SERVER }}/pacman-app         
+        run: docker push $ACR_SERVER/pacman-app         
 
   Cluster:
     runs-on: ubuntu-latest
