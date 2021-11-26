@@ -38,14 +38,14 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -var admin_password=${{secrets.VM_PASSWORD}} --auto-approve -lock=false
 
-      # - name: Get public-ip
-      #   run: |
-      #     terraform output -json > public-ip
-      #     cat  public-ip | grep value > terraform-sed-aux
-      #     sed 's/"value": "//' terraform-sed-aux >  public-ip
-      #     sed 's/.$//'  public-ip > terraform-sed-aux
-      #     sed 's/ //g' terraform-sed-aux >   public-ip
-      #     rm terraform-sed-aux
+      - name: Get public-ip
+        run: |
+          terraform output -json > public-ip
+          cat public-ip | grep value > terraform-sed-aux
+          sed 's/"value": "//' terraform-sed-aux > public-ip
+          sed 's/.$//' public-ip > terraform-sed-aux
+          sed 's/ //g' terraform-sed-aux > public-ip
+          rm terraform-sed-aux
       
       # - name: Add ip to inventory
       #   run: |
@@ -67,7 +67,7 @@ jobs:
       #   run: echo ${{secrets.VM_PASSWORD}}
 
       - name: Run Ansible
-        run: ansible-playbook ./ansible/vault-configure.yml --inventory=13.89.111.24, --extra-vars "ansible_user=azureuser ansible_password=${{secrets.VM_PASSWORD}}"
+        run: ansible-playbook ./ansible/vault-configure.yml --inventory=public-ip --extra-vars "ansible_user=azureuser ansible_password=${{secrets.VM_PASSWORD}}"
   
 
         
