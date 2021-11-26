@@ -162,3 +162,8 @@ provider "azurerm" {
       version   = "latest"
     }
   }
+
+  output "public-ip" {
+  value     = azurerm_linux_virtual_machine.my_vm.public_ip_address
+  sensitive = true
+}
