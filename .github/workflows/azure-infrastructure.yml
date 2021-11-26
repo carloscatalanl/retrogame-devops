@@ -76,7 +76,7 @@ jobs:
           login-server: $ACR_SERVER
         
       - name: Proof
-        run: ACR_USER=$(sed -n 2p  terraform-output-values)
+        run: echo "::set-env name=ACR_USER::sed -n 2p  terraform-output-values"
 
       - name: Proof
         run: echo ${{ env.ACR_USER }}
