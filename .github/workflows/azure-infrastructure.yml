@@ -54,6 +54,9 @@ jobs:
           ACR_PASSWORD=$(sed -n 3p  terraform-output-values)
           rm terraform-output-values terraform-sed-aux
 
+      - name: Proof
+        run: echo $ACR_USER
+
       - name: Build the Docker image
         run: docker build -t pacman-app .
 
@@ -66,6 +69,9 @@ jobs:
           password: $ACR_PASSWORD
           # Container registry server url
           login-server: $ACR_SERVER
+        
+      - name: Proof
+        run: echo $ACR_USER
         
       - name: Tag Docker image
         run: docker tag pacman-app $ACR_SERVER/pacman-app
