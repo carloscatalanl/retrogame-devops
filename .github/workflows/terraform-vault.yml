@@ -61,6 +61,9 @@ jobs:
       - name: Debug2
         run: cat ./ansible/inventory.in
 
+      - name: Debug3
+        run: echo ${{secrets.VM_PASSWORD}}
+
       - name: Run Ansible
         run: ansible-playbook ./ansible/vault-configure.yml -i ./ansible/inventory.in
   
