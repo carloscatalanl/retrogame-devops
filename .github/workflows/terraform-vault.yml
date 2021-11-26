@@ -54,6 +54,9 @@ jobs:
           echo ${{secrets.VM_PASSWORD}} >> aux
           cat aux | tr -d '\n' >> ./ansible/inventory.in
           rm aux
+      
+      - name: Debug
+        run: cat ./ansible/inventory.in
 
       - name: Run Ansible
         run: ansible-playbook ./ansible/vault-configure.yml -i ./ansible/inventory.in
