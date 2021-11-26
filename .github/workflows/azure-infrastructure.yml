@@ -55,7 +55,7 @@ jobs:
           rm terraform-output-values terraform-sed-aux
 
       - name: Build the Docker image
-        run: docker build -t pacman-app ...
+        run: docker build -t pacman-app .
 
       - name: Azure Container Registry Login
         uses: Azure/docker-login@v1
