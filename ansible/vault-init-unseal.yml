@@ -1,0 +1,109 @@
+---
+  - name: Init, Seal & Configure Vault
+    hosts: all
+    become: yes
+
+    vars:
+      unseal_keys_dir_output: /home/keys
+      root_token_dir_output: /home/token
+
+    tasks:
+      - name: Create unseal directories
+        file:
+            path: "{{ unseal_keys_dir_output }}"
+            state: directory
+            
+      - name: Create root key directories
+        file:
+            path: "{{ root_token_dir_output }}"
+            state: directory
+            
+      - name: Initialise Vault operator
+        ansible.builtin.shell: vault operator init -key-shares=5 -key-threshold=3 -format json
+        environment:
+            VAULT_ADDR: "http://127.0.0.1:8200"
+        register: vault_init_results
+
+      - name: Parse output of vault init
+        set_fact:
+            vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+        
+      - name: Write unseal keys to files
+        copy:
+            dest: "{{ unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+            content: "{{ item.1 }}"
+        with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
+            
+      - name: Write root token to file
+        copy:
+            content: "{{ vault_init_parsed.root_token }}"
+            dest: "{{root_token_dir_output}}/rootkey"
+
+      - name: Get all keys files
+        find:
+          paths: "{{ unseal_keys_dir_output }}/"
+          file_type: file
+          recurse: yes
+        register: keys
+
+      - name: Reading unseal key contents
+        ansible.builtin.shell: cat {{item.path}}
+        register: unseal_keys
+        with_items:
+          - "{{keys.files}}"
+        
+      - name: Unseal vault with unseal keys
+        ansible.builtin.shell: |
+            vault operator unseal {{ item.stdout }}
+        environment:
+            VAULT_ADDR: "http://127.0.0.1:8200"
+        with_items: "{{unseal_keys.results}}" 
+
+      - name: Read Vault Token
+        ansible.builtin.shell: cat "{{root_token_dir_output}}/rootkey"
+        register: token
+
+      - name: Export Vault Token
+        ansible.builtin.lineinfile:
+          path: /etc/environment
+          insertbefore: BOF
+          state: present
+          line: 'VAULT_TOKEN="{{token.stdout}}"' 
+      
+      - name: Set the policy
+        ansible.builtin.shell: vault policy write mongodb-kv-policy /home/policy.hcl
+        environment:
+            VAULT_TOKEN="{{token.stdout}}"
+
+
+      - name: Enable Vault AppRole
+        ansible.builtin.shell: vault auth enable approle
+        environment:
+            VAULT_TOKEN="{{token.stdout}}"
+
+      - name: Create a named role and setting the time
+        ansible.builtin.shell: vault write auth/approle/role/pacman token_policies="mongodb-kv-policy" token_ttl=1h token_max_ttl=4h
+        environment:
+            VAULT_TOKEN="{{token.stdout}}"
+
+      
+      - hashivault_approle_role_id:
+          name: 'pacman'
+          register: 'vault_approle_role_id'
+        environment:
+          VAULT_TOKEN="{{token.stdout}}"
+      - debug: msg="{{vault_approle_role_id.id}}"
+
+      - hashivault_approle_role_secret:
+            name: pacman
+            state: present
+            register: vault_approle_role_secret_create
+        environment:
+            VAULT_TOKEN="{{token.stdout}}"
+      - debug: msg="{{vault_approle_role_secret_create.id}}"
+        
+      - name: Set the policy
+        ansible.builtin.shell: vault write auth/approle/login role_id="{{vault_approle_role_id.id}}" secret_id="{{vault_approle_role_secret_create.id}}"
+        environment:
+            VAULT_TOKEN="{{token.stdout}}"
+        
