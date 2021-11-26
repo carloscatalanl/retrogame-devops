@@ -10,4 +10,4 @@ terraform destroy -auto-approve
 
 # Vault
 cd terraform/vault/
-terraform destroy -auto-approve
+terraform destroy -var admin_password="1234" -auto-approve
