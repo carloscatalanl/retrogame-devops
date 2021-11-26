@@ -67,18 +67,6 @@ spec:
             secretKeyRef:
               key:  username
               name: {{ .Release.Name }}-auth
-
-        - name: VAULT_ADDR
-          valueFrom:
-            secretKeyRef:
-              key:  external_vault_address
-              name: {{ .Release.Name }}-auth
-        - name: VAULT_TOKEN
-          valueFrom:
-            secretKeyRef:
-              key:  token
-              name: {{ .Release.Name }}-auth
-
         - name: MONGO_AUTH_PWD
           valueFrom:
             secretKeyRef:
