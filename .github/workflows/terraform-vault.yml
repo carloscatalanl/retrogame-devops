@@ -51,9 +51,11 @@ jobs:
         run: |
           cat public-ip >> aux
           echo ' ansible_user=azureuser ansible_ssh_pass=' >> aux
-          echo ${{secrets.VM_PASSWORD}} >> aux
+          echo $ANSIBLE_PASSWORD >> aux
           cat aux | tr -d '\n' >> ./ansible/inventory.in
           rm aux
+        env:
+          ANSIBLE_PASSWORD: ${{secrets.VM_PASSWORD}}
       
       - name: Debug
         run: cat public-ip
