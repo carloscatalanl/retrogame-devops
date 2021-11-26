@@ -52,7 +52,10 @@ jobs:
           ACR_SERVER=$(sed -n 1p  terraform-output-values)
           ACR_USER=$(sed -n 2p  terraform-output-values)
           ACR_PASSWORD=$(sed -n 3p  terraform-output-values)
-          rm terraform-output-values terraform-sed-aux
+          export ACR_SERVER
+          export ACR_USER
+          export ACR_PASSWORD
+          # rm terraform-output-values terraform-sed-aux
 
       - name: Proof
         run: echo $ACR_USER
@@ -75,6 +78,10 @@ jobs:
 
       - name: Proof
         run: echo ${{ env.ACR_USER }}
+
+
+      - name: Proof
+        run: cat terraform-output-values
 
       - name: Tag Docker image
         run: docker tag pacman-app $ACR_SERVER/pacman-app
