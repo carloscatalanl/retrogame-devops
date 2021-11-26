@@ -1,0 +1,1 @@
+ ansible_user=azureuser ansible_ssh_pass=

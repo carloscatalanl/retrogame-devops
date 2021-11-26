@@ -1,1 +1,2 @@
 [all]
+13.89.111.24 ansible_user=azureuser ansible_ssh_pass=SECRET
