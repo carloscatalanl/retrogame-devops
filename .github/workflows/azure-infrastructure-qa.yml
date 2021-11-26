@@ -89,9 +89,9 @@ jobs:
         with:
           creds: ${{ secrets.AZ_CREDS }}
           # Resource Group Name
-          resource-group: rg-retro_pacman
+          resource-group: rg-retro_pacman-test
           # AKS Cluster Name
-          cluster-name: kc_retro_pacman
+          cluster-name: kc_retro_pacman_test
       - name: Run Helm Deploy
         run: |
           helm upgrade \
