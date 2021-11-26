@@ -77,7 +77,10 @@ jobs:
         run: echo $ACR_USER
 
       - name: Proof
-        run: echo ${{ env.ACR_USER }}
+        run: ACR_SERVER=$(sed -n 1p  terraform-output-values)
+      
+      - name: Proof
+        run: echo $ACR_USER
 
 
       - name: Proof
