@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
 
-  DeployInfra:
+  DeployVault:
 
     runs-on: ubuntu-latest
     
@@ -47,28 +47,5 @@ jobs:
           sed 's/ //g' terraform-sed-aux > public-ip
           rm terraform-sed-aux
       
-      # - name: Add ip to inventory
-      #   run: |
-      #     cat public-ip >> aux
-      #     echo ' ansible_user=azureuser ansible_ssh_pass=' >> aux
-      #     echo $ANSIBLE_PASSWORD >> aux
-      #     cat aux | tr -d '\n' >> ./ansible/inventory.in
-      #     rm aux
-      #   env:
-      #     ANSIBLE_PASSWORD: ${{secrets.VM_PASSWORD}}
-      
-      # - name: Debug
-      #   run: cat public-ip
-
-      # - name: Debug2
-      #   run: cat ./ansible/inventory.in
-
-      # - name: Debug3
-      #   run: echo ${{secrets.VM_PASSWORD}}
-
       - name: Run Ansible
         run: ansible-playbook ./ansible/vault-configure.yml --inventory=public-ip --extra-vars "ansible_user=azureuser ansible_password=${{secrets.VM_PASSWORD}}"
-  
-
-        
-        
