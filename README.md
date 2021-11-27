@@ -35,9 +35,23 @@ Some details about the infra
 
 ---
 
-Diagram of the pipelines
+## QA and Production deployment
 
-Description of each pipeline
+![](docs/pipelines.png)
+
+In these pipelines test, build, tag and push the docker image of the project. Then, restart the app pod and pull the latest version of the image.
+
+### - Test
+  - Verify if docker is already installed
+  - (Pending QA team test)
+
+### - Release
+  - Build docker image
+  - Tag docker image
+  - Push docker image into ACR
+  
+### - Deploy
+  - Restart app pod and pull the latest image
 
 ## Technologies justification
 
