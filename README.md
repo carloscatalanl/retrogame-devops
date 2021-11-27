@@ -1,6 +1,6 @@
 # README
 
-# Retro Game Demo Project Team 1
+# Pacman Demo Project Team 1
 
 ---
 
@@ -61,7 +61,7 @@ We build the infrastructure on cloud because users can scale services to fit the
 
 ![https://i.imgur.com/rJWQIbs.png](https://i.imgur.com/rJWQIbs.png)
 
-We decided to use Microsoft Azure because is one of tools that we have more experience working with, also Microsoft Azure offers more than 200 products and cloud services designed to help us bring new solutions to our applications, we build the Kubernetes cluster and the Azure Container Registry. With Microsoft Azure we can store all the resources in the same environment and it's easy to handle them.
+We decided to use Microsoft Azure because is one of tools that we have more experience working with, also Microsoft Azure offers more than 200 products and cloud services designed to help us bring new solutions to our applications, we build the Kubernetes cluster and the Azure Container Registry. With Microsoft Azure we can store all the resources in the same environment and it's easy to handle them. The Microsoft Azure documentation is one of the most complete.
 
 ![https://i.imgur.com/FwjLRp6.jpg](https://i.imgur.com/FwjLRp6.jpg)
 
@@ -77,14 +77,53 @@ For Version Control System we are using GitHub because there is a excellent docu
 
 GitHub Actions makes it easy to automate all your software workflows. Build, test, and deploy your code right from GitHub. Make code reviews, branch management, and issue triaging work the way you want. Kick off workflows with GitHub events like push, issue creation, or a new release. Combine and configure actions for the services you use, built and maintained by the community.
 
-## Configure Azure
+![https://i.imgur.com/f3urqAi.png](https://i.imgur.com/f3urqAi.png)
 
-- Create service principal
-    
-    ```
-    az ad sp create-for-rbac --role="Owner" --scopes="/subscriptions/<subscription_id>"
-    ```
-    
+We are using Vault because supports most of the major cloud platforms. HashiCorp Vault can provide consolidated secrets management for the entire organization. Using the KV (key/value) storage backend, Vault can help organize secrets by department, team, business unit, application, or any other way that makes sense for the respective organization. Vault policies can be created to ensure that the principle of least privilege is followed, and access to secrets is only provided to individuals, teams, or applications that need them for business functions. Additionally, once the secrets are written to Vault, they can be accessed through Vault's UI, CLI, or API, making it simple for the retrieval of secrets.
+
+![https://i.imgur.com/tgl4pZl.png](https://i.imgur.com/tgl4pZl.png)
+
+The team chose this tool because Ansible **automates and simplifies repetitive, and complex operations**. Everybody likes it because it brings **huge time savings** when we install packages or configure large numbers of servers.
+
+Its architecture is simple and effective. It works by connecting to your nodes and pushing small programs to them. These programs make the system comply with a desired state, and, when they have finished their tasks, they are deleted.
+
+Ansible **works over SSH** and doesn't require any daemons, special servers, or libraries to work. A text editor and a command line tool are usually enough to get your work done.
+
+# How to
+
+# Configure Azure
+
+Create service principal
+
+```bash
+az ad sp create-for-rbac --role="Owner" --scopes="/subscriptions/<subscription_id>"
+```
+
+Clone the GitHub Repository:
+
+```bash
+git clone https://github.com/carloscatalanl/retrogame-devops.git
+```
+
+## Deploy Terraform Backend:
+
+```bash
+./deploy-backend.sh
+```
+
+Run the Pipelines on this order:
+
+1. **Deploy QA Infrastructure in Azure**
+2. **Deploy Infrastructure in Azure**
+3. **Deploy Vault Infrastructure in Azure**
+
+Enter to you Github actions, then click on the workflow and finally click on "Run workflow"
+
+![https://i.imgur.com/x28beC4.png](https://i.imgur.com/x28beC4.png)
+
+The secrets that you have to set are the next:
+
+- 
 
 ## Build and push Docker Image
 
