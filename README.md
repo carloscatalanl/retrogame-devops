@@ -37,21 +37,41 @@ Some details about the infra
 
 ## QA and Production deployment
 
-![](docs/pipelines.png)
+![](docs/cicd-dev.png)
 
 In these pipelines test, build, tag and push the docker image of the project. Then, restart the app pod and pull the latest version of the image.
 
-### - Test
+- Test
   - Verify if docker is already installed
   - (Pending QA team test)
-
-### - Release
+  
+- Release
   - Build docker image
   - Tag docker image
-  - Push docker image into ACR
+  - Push docker image into ACR (QA or Production)
   
-### - Deploy
+- Deploy
   - Restart app pod and pull the latest image
+
+## QA and Production infrastructure
+
+![](docs/cicd-prod.png)
+
+- Terraform
+  - Init
+  - Format
+  - Validate
+  - Plan
+  - Apply (Deploy) Terraform infrastructure
+
+- Release 
+  - Build docker image
+  - Tag docker image
+  - Push docker image into ACR (QA or Production)
+
+- Helm
+  - Install Helm
+  - Run Helm deploy
 
 ## Technologies justification
 
