@@ -803,7 +803,8 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 - And *inventory.in* file, this is empty because it will be filled once the playbook has been run:
-````
+  
+```
 [all]
 ```
 
@@ -813,5 +814,19 @@ Finally, execute the command:
 ansible-playbook ./ansible/vault-configure.yml --inventory=VM_PUBLIC_IP --extra-vars "ansible_user=VM_USERNAME ansible_password=VM_PASSWORD"
 ```
 
+
+
 > Just to point out: Do not miss the parameter in the command above to set the host, and to add the user and password.
->
+
+---
+
+## Authors
+* **Carlos Catalán** - [Github](https://github.com/carloscatalanl)
+
+* **Alan Ortega** - [Github](https://github.com/alanortegadou)
+
+* **Alberto Valle** - [Github](https://github.com/beto44)
+
+* **Sergio Velázquez** - [Github](https://github.com/cubomx)
+
+
