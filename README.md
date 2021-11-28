@@ -27,7 +27,7 @@ We build this solution to integrate and automate the project using CI/CD tools, 
 
 This project uses the [pacman-project](https://github.com/font/k8s-example-apps).
 
-Image of the infra.
+![https://i.imgur.com/en1WfMV.png](https://i.imgur.com/en1WfMV.png)
 
 Some details about the infra
 
