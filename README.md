@@ -29,7 +29,24 @@ This project uses the [pacman-project](https://github.com/font/k8s-example-apps)
 
 ![https://i.imgur.com/en1WfMV.png](https://i.imgur.com/en1WfMV.png)
 
-Some details about the infra
+This infrastructure consist of 3 different resource groups:
+
+- QA
+  - Azure Register Container for the project Docker images
+  - Azure Kubernetes Service
+    - Pacman app
+    - Mongodb 
+
+- Production
+  - Azure Register Container for the project Docker images
+  - Azure Kubernetes Service
+    - Pacman app
+    - Mongodb 
+    - Vault agent
+  - Virtual machine for Vault server
+
+- Backend
+  - Azure Storage Account for terraform-state files
 
 ## Pipelines
 
